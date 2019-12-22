@@ -161,14 +161,17 @@ func monitorMain(runtimeOptions RuntimeOptions) {
 				// Successful exit indicates an intentional shutdown
 				return
 			} else if exiterr, ok := err.(*exec.ExitError); ok {
-				if exiterr.ExitCode() == syncthing.ExitUpgrade.AsInt() {
-					// Restart the monitor process to release the .old
-					// binary as part of the upgrade process.
-					l.Infoln("Restarting monitor...")
-					if err = restartMonitor(args); err != nil {
-						l.Warnln("Restart:", err)
+				if status, ok := exiterr.Sys().(syscall.WaitStatus); ok {
+					switch status.ExitStatus() {
+					case exitUpgrading:
+						// Restart the monitor process to release the .old
+						// binary as part of the upgrade process.
+						l.Infoln("Restarting monitor...")
+						if err = restartMonitor(args); err != nil {
+							l.Warnln("Restart:", err)
+						}
+						return
 					}
-					return
 				}
 			}
 		}

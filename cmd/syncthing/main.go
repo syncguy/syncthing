@@ -47,6 +47,7 @@ import (
 const (
 	tlsDefaultCommonName   = "syncthing"
 	deviceCertLifetimeDays = 20 * 365
+	exitUpgrading          = 4
 )
 
 const (
